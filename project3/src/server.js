@@ -35,8 +35,8 @@ app.use(express.static('public'));
 sequelize.authenticate()
     .then(() => {
         console.log('Database connection has been established successfully.');
-        // Sync database with force option
-        return sequelize.sync({ force: true });
+        // Sync database with alter option
+        return sequelize.sync({ alter: true });
     })
     .then(() => {
         console.log('Database synchronized and tables created.');

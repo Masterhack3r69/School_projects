@@ -11,9 +11,12 @@ const createTestData = async (shouldCloseConnection = false) => {
         await sequelize.authenticate();
         console.log('Database connection established.');
 
-        // Sync models with database
-        await sequelize.sync({ force: true }); // This will drop and recreate all tables
-        console.log('Database synchronized.');
+        // Check if test data already exists
+        const adminExists = await User.findOne({ where: { username: 'admin1' } });
+        if (adminExists) {
+            console.log('Test data already exists, skipping creation.');
+            return;
+        }
 
         // Create test admin and teacher users
         const admin = await User.create({

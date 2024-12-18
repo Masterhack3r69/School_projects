@@ -176,12 +176,41 @@ const auth = {
 
 // Helper function to show alerts
 function showAlert(message, type) {
+    // Create alert container if it doesn't exist
+    let alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'alertContainer';
+        document.body.appendChild(alertContainer);
+    }
+
+    // Create alert element
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.className = `alert alert-${type} alert-dismissible`;
     alertDiv.innerHTML = `
-        ${message}
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+            <div>${message}</div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
-    setTimeout(() => alertDiv.remove(), 5000);
+
+    // Add to container
+    alertContainer.appendChild(alertDiv);
+
+    // Trigger animation
+    setTimeout(() => alertDiv.classList.add('show'), 10);
+
+    // Remove after delay
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 5000);
+
+    // Handle close button
+    const closeButton = alertDiv.querySelector('.btn-close');
+    closeButton.addEventListener('click', () => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => alertDiv.remove(), 300);
+    });
 } 
