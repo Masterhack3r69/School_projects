@@ -81,19 +81,32 @@
                             </form>
                             <form id="registerForm" style="display: none;">
                                 <div class="mb-3">
+                                    <label for="regFirstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="regFirstName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="regLastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="regLastName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="regMiddleInitial" class="form-label">Middle Initial</label>
+                                    <input type="text" class="form-control" id="regMiddleInitial" maxlength="1">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="regCourse" class="form-label">Course</label>
+                                    <input type="text" class="form-control" id="regCourse" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="regSchoolId" class="form-label">School ID (Format: C-20XX-XXXX)</label>
+                                    <input type="text" class="form-control" id="regSchoolId" required pattern="^C-20[2-9][0-9]-\d{4}$" title="School ID must follow the format C-20XX-XXXX (e.g., C-2023-1234) where year must be 2022 or later">
+                                </div>
+                                <div class="mb-3">
                                     <label for="regUsername" class="form-label">Username</label>
                                     <input type="text" class="form-control" id="regUsername" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="regPassword" class="form-label">Password</label>
                                     <input type="password" class="form-control" id="regPassword" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="role" class="form-label">Role</label>
-                                    <select class="form-control" id="role" required>
-                                        <option value="student">Student</option>
-                                        <option value="teacher">Teacher</option>
-                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Register</button>
                             </form>

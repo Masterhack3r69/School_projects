@@ -17,6 +17,37 @@ const auth = {
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('loginTab').addEventListener('click', () => this.toggleForms('login'));
         document.getElementById('registerTab').addEventListener('click', () => this.toggleForms('register'));
+
+        // Add school ID validation on input
+        const schoolIdInput = document.getElementById('regSchoolId');
+        schoolIdInput.addEventListener('input', (e) => this.validateSchoolId(e.target));
+    },
+
+    validateSchoolId(input) {
+        const schoolIdPattern = /^C-20[2-9][0-9]-\d{4}$/;
+        const value = input.value;
+        
+        if (value && !schoolIdPattern.test(value)) {
+            input.setCustomValidity('School ID must follow the format C-20XX-XXXX (e.g., C-2023-1234) where year must be 2022 or later');
+        } else {
+            // Additional year validation
+            if (value) {
+                const year = parseInt(value.substring(2, 6));
+                const currentYear = new Date().getFullYear();
+                
+                if (year < 2022) {
+                    input.setCustomValidity('School ID year must be 2022 or later');
+                } else if (year > currentYear + 1) {
+                    input.setCustomValidity('School ID year cannot be more than one year in the future');
+                } else {
+                    input.setCustomValidity('');
+                }
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+        
+        input.reportValidity();
     },
 
     async login(e) {
@@ -52,15 +83,32 @@ const auth = {
 
     async register(e) {
         e.preventDefault();
-        const username = document.getElementById('regUsername').value;
-        const password = document.getElementById('regPassword').value;
-        const role = document.getElementById('role').value;
+        
+        // Get form values
+        const form = e.target;
+        const formData = {
+            username: form.querySelector('#regUsername').value,
+            password: form.querySelector('#regPassword').value,
+            firstName: form.querySelector('#regFirstName').value,
+            lastName: form.querySelector('#regLastName').value,
+            middleInitial: form.querySelector('#regMiddleInitial').value,
+            course: form.querySelector('#regCourse').value,
+            schoolId: form.querySelector('#regSchoolId').value,
+            role: 'student' // Always set role to student
+        };
+
+        // Validate school ID format
+        const schoolIdPattern = /^C-20[2-9][0-9]-\d{4}$/;
+        if (!schoolIdPattern.test(formData.schoolId)) {
+            showAlert('Invalid School ID format. Must be C-20XX-XXXX where XX is 22 or later', 'danger');
+            return;
+        }
 
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, role })
+                body: JSON.stringify(formData)
             });
 
             const data = await response.json();
@@ -68,6 +116,7 @@ const auth = {
 
             showAlert('Registration successful! Please login.', 'success');
             this.toggleForms('login');
+            form.reset();
         } catch (error) {
             showAlert(error.message, 'danger');
         }
@@ -89,7 +138,9 @@ const auth = {
         document.getElementById('logoutNav').style.display = isLoggedIn ? 'block' : 'none';
         
         if (isLoggedIn && this.user) {
-            document.getElementById('userInfo').textContent = `${this.user.username} (${this.user.role})`;
+            const userInfo = document.getElementById('userInfo');
+            userInfo.textContent = `${this.user.firstName} ${this.user.lastName} (${this.user.role})`;
+            
             const isTeacherAdmin = ['teacher', 'admin'].includes(this.user.role);
             const isStudent = this.user.role === 'student';
 
@@ -131,6 +182,6 @@ function showAlert(message, type) {
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 3000);
+    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
+    setTimeout(() => alertDiv.remove(), 5000);
 } 
