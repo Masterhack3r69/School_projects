@@ -31,21 +31,33 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Test database connection and sync
-sequelize.authenticate()
-    .then(() => {
+// Initialize database and start server
+async function initializeServer() {
+    try {
+        // Test database connection
+        await sequelize.authenticate();
         console.log('Database connection has been established successfully.');
+
         // Sync database with alter option
-        return sequelize.sync({ alter: true });
-    })
-    .then(() => {
+        await sequelize.sync({ alter: true });
         console.log('Database synchronized and tables created.');
-        // Create test data
-        return createTestData();
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
-    });
+
+        // Create test data if needed
+        const userCount = await User.count();
+        if (userCount === 0) {
+            await createTestData(false);
+        }
+
+        // Start server
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Unable to start server:', error);
+        process.exit(1);
+    }
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -67,8 +79,5 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-}); 
+// Start the server
+initializeServer(); 

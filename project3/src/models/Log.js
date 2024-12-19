@@ -1,7 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User');
-const Computer = require('./Computer');
 
 const Log = sequelize.define('Log', {
     id: {
@@ -19,41 +17,35 @@ const Log = sequelize.define('Log', {
     },
     computerId: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
             model: 'Computers',
             key: 'id'
         }
     },
     operation: {
-        type: DataTypes.ENUM(
-            'computer-login',
-            'computer-logout',
-            'maintenance-start',
-            'maintenance-end',
-            'create',
-            'delete'
-        ),
+        type: DataTypes.STRING,
         allowNull: false
-    },
-    timestamp: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
     },
     details: {
         type: DataTypes.TEXT,
         allowNull: true
+    },
+    timestamp: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     }
 });
 
-// Define associations
 const setupAssociations = () => {
+    const User = require('./User');
+    const Computer = require('./Computer');
+
     Log.belongsTo(User, {
         foreignKey: 'userId',
         as: 'User'
     });
-    
+
     Log.belongsTo(Computer, {
         foreignKey: 'computerId',
         as: 'Computer'
